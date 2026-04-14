@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
       headers: request.headers,
     },
   })
-
+  console.log(process.env.NEXT_PUBLIC_SUPABASE_URL)
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -22,22 +22,25 @@ export async function middleware(request: NextRequest) {
           return request.cookies.get(name)?.value
         },
         set(name: string, value: string, options: any) {
-          response.cookies.set({ 
-            name, 
-            value, 
-            ...options,
-            sameSite: 'lax',
-            path: '/'
-          })
-        },
-        remove(name: string, options: any) {
-          response.cookies.set({ 
-            name, 
-            value: '', 
+          response.cookies.set({
+            name,
+            value,
             ...options,
             sameSite: 'lax',
             path: '/',
-            maxAge: 0
+            // Убираем domain, чтобы куки привязывались к текущему IP/хосту
+            domain: undefined
+          })
+        },
+        remove(name: string, options: any) {
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 0,
+            domain: undefined
           })
         },
       },
