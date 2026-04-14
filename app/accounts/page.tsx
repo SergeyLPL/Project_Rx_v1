@@ -35,15 +35,19 @@ export default async function AccountsPage() {
         <div className="max-w-sm mx-auto flex">
           <a href="/transactions" className="flex-1 py-3 text-center">
             <span className="text-xl block">📋</span>
-            <span className="text-[10px] text-[#55504a]">Транзакции</span>
+            <span className="text-[10px] text-[#55504a]">Чеки</span>
           </a>
           <a href="/accounts" className="flex-1 py-3 text-center border-b-2 border-[#c9a84c]">
             <span className="text-xl block">🏦</span>
             <span className="text-[10px] text-[#c9a84c]">Счета</span>
           </a>
-          <a href="/reports" className="flex-1 py-3 text-center">
+          <a href="/dashboard" className="flex-1 py-3 text-center">
             <span className="text-xl block">📊</span>
-            <span className="text-[10px] text-[#55504a]">Отчёты</span>
+            <span className="text-[10px] text-[#55504a]">Дашборд</span>
+          </a>
+          <a href="/reports" className="flex-1 py-3 text-center">
+            <span className="text-xl block">📈</span>
+            <span className="text-[10px] text-[#55504a]">Отчёт</span>
           </a>
         </div>
       </nav>

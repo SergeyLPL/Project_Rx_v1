@@ -32,9 +32,13 @@ export default async function TransactionsPage() {
             <span className="text-xl block">🏦</span>
             <span className="text-[10px] text-[#55504a]">Счета</span>
           </a>
-          <a href="/reports" className="flex-1 py-3 text-center">
+          <a href="/dashboard" className="flex-1 py-3 text-center">
             <span className="text-xl block">📊</span>
-            <span className="text-[10px] text-[#55504a]">Отчёты</span>
+            <span className="text-[10px] text-[#55504a]">Дашборд</span>
+          </a>
+          <a href="/reports" className="flex-1 py-3 text-center">
+            <span className="text-xl block">📈</span>
+            <span className="text-[10px] text-[#55504a]">Отчёт</span>
           </a>
         </div>
       </nav>

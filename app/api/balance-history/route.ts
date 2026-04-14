@@ -3,14 +3,19 @@ import { NextResponse } from 'next/server'
 
 /**
  * GET /api/balance-history — получить историю баланса по дням
+ * Query params: period=30d | 1y
  */
-export async function GET() {
+export async function GET(request: Request) {
   const supabase = await createClient()
   const { data: { session } } = await supabase.auth.getSession()
 
   if (!session) {
     return NextResponse.json({ error: 'Не авторизован' }, { status: 401 })
   }
+
+  const { searchParams } = new URL(request.url)
+  const period = searchParams.get('period') === '1y' ? '1y' : '30d'
+  const days = period === '1y' ? 365 : 30
 
   // Получаем все счета пользователя
   const { data: accounts } = await supabase
@@ -22,15 +27,15 @@ export async function GET() {
     return NextResponse.json({ history: [] })
   }
 
-  // Получаем все чеки за последние 30 дней
-  const thirtyDaysAgo = new Date()
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+  // Получаем все чеки за период
+  const periodAgo = new Date()
+  periodAgo.setDate(periodAgo.getDate() - days)
 
   const { data: receipts } = await supabase
     .from('receipts')
-    .select('id, type, total, date, account_id')
+    .select('id, type, total, date')
     .eq('user_id', session.user.id)
-    .gte('date', thirtyDaysAgo.toISOString())
+    .gte('date', periodAgo.toISOString())
     .order('date', { ascending: true })
 
   // Текущий баланс
@@ -47,7 +52,7 @@ export async function GET() {
     })
   }
 
-  // Группируем по дням: расходы вычитаем, доходы прибавляем
+  // Группируем по дням
   const dailyChange: Record<string, number> = {}
   receipts.forEach(r => {
     const day = r.date?.split('T')[0] || ''
@@ -57,27 +62,57 @@ export async function GET() {
     }
   })
 
-  // Строим историю: от прошлого к текущему
+  // Строим историю
   const history: { date: string; balance: number }[] = []
-  
-  // Начальный баланс = текущий - все изменения за период
-  const totalChange = Object.values(dailyChange).reduce((s, v) => s + v, 0)
-  let runningBalance = currentBalance - totalChange
+  let runningBalance = currentBalance
 
-  // Проходим по всем 30 дням
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    const dayStr = d.toISOString().split('T')[0]
-
-    if (dailyChange[dayStr] !== undefined) {
-      runningBalance += dailyChange[dayStr]
-    }
-
-    history.push({
-      date: dayStr,
-      balance: Math.max(0, Math.round(runningBalance * 100) / 100)
+  // Для 30 дней — идем от прошлого к настоящему
+  // Для 1 года — группируем по месяцам
+  if (period === '1y') {
+    const monthlyChange: Record<string, number> = {}
+    Object.entries(dailyChange).forEach(([day, amount]) => {
+      const month = day.substring(0, 7) // YYYY-MM
+      monthlyChange[month] = (monthlyChange[month] || 0) + amount
     })
+
+    // Начальный баланс = текущий - все изменения
+    const totalChange = Object.values(monthlyChange).reduce((s, v) => s + v, 0)
+    runningBalance = currentBalance - totalChange
+
+    // За последние 12 месяцев
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date()
+      d.setMonth(d.getMonth() - i)
+      const monthStr = d.toISOString().substring(0, 7)
+
+      if (monthlyChange[monthStr] !== undefined) {
+        runningBalance += monthlyChange[monthStr]
+      }
+
+      history.push({
+        date: monthStr + '-01',
+        balance: Math.max(0, Math.round(runningBalance * 100) / 100)
+      })
+    }
+  } else {
+    // 30 дней
+    const totalChange = Object.values(dailyChange).reduce((s, v) => s + v, 0)
+    runningBalance = currentBalance - totalChange
+
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      const dayStr = d.toISOString().split('T')[0]
+
+      if (dailyChange[dayStr] !== undefined) {
+        runningBalance += dailyChange[dayStr]
+      }
+
+      history.push({
+        date: dayStr,
+        balance: Math.max(0, Math.round(runningBalance * 100) / 100)
+      })
+    }
   }
 
   return NextResponse.json({ history })
