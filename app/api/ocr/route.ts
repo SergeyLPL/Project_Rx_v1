@@ -67,10 +67,11 @@ export async function POST(request: Request) {
         let data = ''
         res.on('data', chunk => { data += chunk })
         res.on('end', () => {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
+          const status = res.statusCode || 500;
+          if (status >= 200 && status < 300) {
             resolve(JSON.parse(data))
           } else {
-            reject(new Error(`Ollama error ${res.statusCode}: ${data.substring(0, 500)}`))
+            reject(new Error(`Ollama error ${status}: ${data.substring(0, 500)}`))
           }
         })
       })

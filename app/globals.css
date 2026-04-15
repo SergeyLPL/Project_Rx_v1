@@ -137,3 +137,14 @@ body {
   background: var(--bg-card-border);
   border-radius: 2px;
 }
+
+/* Скрываем Next.js Development Overlay в браузере */
+nextjs-portal,
+[data-nextjs-toast],
+[data-nextjs-route-handler],
+[data-nextjs-dev-tools] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

@@ -12,7 +12,7 @@ interface Transaction {
   id?: string
   account_id: string
   type: 'income' | 'expense'
-  amount: string
+  amount: string | number
   category: string
   description: string
   date: string
@@ -57,7 +57,7 @@ export default function TransactionForm({ open, transaction, accounts, onClose, 
     if (!form.account_id || !form.amount) return
     setLoading(true)
     try {
-      await onSubmit({ ...form, amount: parseFloat(form.amount) })
+      await onSubmit({ ...form, amount: typeof form.amount === 'number' ? form.amount : parseFloat(form.amount) })
       onClose()
     } catch (err) { alert('Ошибка сохранения') } finally { setLoading(false) }
   }

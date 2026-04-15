@@ -36,7 +36,6 @@ export default async function ReportsPage() {
       <nav className="fixed bottom-0 left-0 right-0 bg-[#161618] border-t border-[#2a2825]">
         <div className="max-w-sm mx-auto flex">
           <a href="/transactions" className="flex-1 py-3 text-center">
-            <span className="text-xl block">📋</span>
             <span className="text-[10px] text-[#55504a]">Чеки</span>
           </a>
           <a href="/accounts" className="flex-1 py-3 text-center">

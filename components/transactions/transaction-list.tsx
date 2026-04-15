@@ -5,8 +5,9 @@ import TransactionForm from './transaction-form'
 
 interface Transaction {
   id: string
+  account_id: string
   type: 'income' | 'expense'
-  amount: number
+  amount: string | number
   category: string
   description: string
   date: string

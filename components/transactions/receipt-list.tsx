@@ -14,12 +14,13 @@ interface ReceiptItem {
 
 interface Receipt {
   id: string
+  account_id: string
   type: string
   shop_name: string
   total: number
   date: string
   account: { name: string; icon: string }
-  items?: ReceiptItem[]
+  items: ReceiptItem[]
 }
 
 interface Account {

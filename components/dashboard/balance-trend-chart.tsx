@@ -95,8 +95,8 @@ export default function BalanceTrendChart() {
               domain={[minBalance - padding, maxBalance + padding]}
             />
             <Tooltip
-              formatter={(value: number) => `${value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} ₽`}
-              labelFormatter={(label) => label}
+              formatter={(value: any) => `${Number(value).toLocaleString('ru-RU', { minimumFractionDigits: 2 })} ₽`}
+              labelFormatter={(label: any) => label}
               contentStyle={{
                 backgroundColor: '#161618',
                 border: '1px solid #2a2825',
